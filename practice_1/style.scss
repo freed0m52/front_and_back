@@ -1,10 +1,8 @@
-// ========== ПЕРЕМЕННЫЕ ==========
-$primary-color: #3498db;       // цвет заголовка
-$secondary-color: #2ecc71;     // цвет кнопки
-$border-radius: 12px;          // скругление углов
-$box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // тень
+$primary-color: #3498db;       
+$secondary-color: #2ecc71;    
+$border-radius: 12px;          
+$box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
 
-// ========== МИКСИН ==========
 @mixin button-style($bg-color) {
     background-color: $bg-color;
     color: white;
@@ -19,7 +17,6 @@ $box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // тень
     }
 }
 
-// ========== ВЛОЖЕННАЯ СТРУКТУРА ==========
 body {
     font-family: Arial, sans-serif;
     display: flex;

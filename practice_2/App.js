@@ -36,8 +36,12 @@ app.post('/products', (req, res) => {
         return res.status(400).json({ message: 'Название и цена обязательны' });
     }
 
+    const maxId = products.length > 0 
+        ? Math.max(...products.map(p => p.id)) 
+        : 0;
+
     const newProduct = {
-        id: Date.now(),
+        id: maxId + 1,  
         name,
         price
     };

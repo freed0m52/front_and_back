@@ -1,0 +1,64 @@
+// ========== ПЕРЕМЕННЫЕ ==========
+$primary-color: #3498db;       // цвет заголовка
+$secondary-color: #2ecc71;     // цвет кнопки
+$border-radius: 12px;          // скругление углов
+$box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); // тень
+
+// ========== МИКСИН ==========
+@mixin button-style($bg-color) {
+    background-color: $bg-color;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.3s ease;
+
+    &:hover {
+        background-color: darken($bg-color, 10%);
+    }
+}
+
+// ========== ВЛОЖЕННАЯ СТРУКТУРА ==========
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.card {
+    background: white;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    max-width: 300px;
+    padding: 20px;
+    text-align: center;
+
+    &__image {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: $border-radius;
+    }
+
+    &__title {
+        font-size: 1.5rem;
+        margin: 15px 0 5px;
+        color: $primary-color;
+    }
+
+    &__description {
+        font-size: 0.95rem;
+        color: #555;
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    &__button {
+        @include button-style($secondary-color);
+    }
+}

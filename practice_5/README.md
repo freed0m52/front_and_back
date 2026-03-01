@@ -1,22 +1,24 @@
-# Работа с Swagger
+# Практическое занятие №5: Swagger документация API
 
-## 1. Демонстрация главного экрана Swagger и всех эндпоинтов
-![Swagger Main](1.png)
+## Скриншоты работы
 
-## 2. Развернутый GET /api/products - Получение всех товаров
-![GET Products](2.png)
+### 1. Главный экран Swagger со всеми эндпоинтами
+![Главный экран](1.png)
 
-## 3. Развернутый POST /api/products - Создание нового товара
-![POST Product](3.png)
+### 2. GET /api/products - получение всех товаров
+![GET all products](2.png)
 
-## 4. GET /api/products/{id} - Получение товара по ID
+### 3. POST /api/products - создание нового товара
+![POST product](3.png)
+
+### 4. GET /api/products/{id} - получение товара по ID
 ![GET by ID](4.png)
 
-## 5. PATCH /api/products/{id} - Обновление товара
-![PATCH Product](5.png)
+### 5. PATCH /api/products/{id} - обновление товара
+![PATCH product](5.png)
 
-## 6. DELETE /api/products/{id} - Удаление товара
-![DELETE Product](6.png)
+### 6. DELETE /api/products/{id} - удаление товара
+![DELETE product](6.png)
 
-## 7. Пример выполнения PATCH запроса
-![PATCH Example](7.png)
+### 7. Пример выполнения PATCH запроса
+![PATCH example](7.png)

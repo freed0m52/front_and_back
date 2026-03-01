@@ -6,7 +6,7 @@
 ![Главный экран](https://github.com/freed0m52/front_and_back/blob/main/practice_5/1.PNG)
 
 ### 2. GET /api/products - получение всех товаров
-![GET all products](2.png)
+![GET all products](https://github.com/freed0m52/front_and_back/blob/main/practice_5/2.PNG)
 
 ### 3. POST /api/products - создание нового товара
 ![POST product](3.png)
@@ -22,4 +22,5 @@
 
 ### 7. Пример выполнения PATCH запроса
 ![PATCH example](7.png)
+
 

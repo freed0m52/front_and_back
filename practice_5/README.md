@@ -12,7 +12,7 @@
 ![POST product](https://github.com/freed0m52/front_and_back/blob/main/practice_5/3.PNG)
 
 ### 4. GET /api/products/{id} - получение товара по ID
-![GET by ID](4.png)
+![GET by ID](https://github.com/freed0m52/front_and_back/blob/main/practice_5/4.PNG)
 
 ### 5. PATCH /api/products/{id} - обновление товара
 ![PATCH product](5.png)
@@ -22,6 +22,7 @@
 
 ### 7. Пример выполнения PATCH запроса
 ![PATCH example](7.png)
+
 
 
 

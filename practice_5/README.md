@@ -3,7 +3,7 @@
 ## Скриншоты работы
 
 ### 1. Главный экран Swagger со всеми эндпоинтами
-![Главный экран](1.png)
+![Главный экран](https://github.com/freed0m52/front_and_back/blob/main/practice_5/1.PNG)
 
 ### 2. GET /api/products - получение всех товаров
 ![GET all products](2.png)
@@ -22,3 +22,4 @@
 
 ### 7. Пример выполнения PATCH запроса
 ![PATCH example](7.png)
+

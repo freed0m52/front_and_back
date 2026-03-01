@@ -1,6 +1,4 @@
-# Практическое занятие №5: Swagger документация API
-
-## Скриншоты работы
+## Работа с Swagger
 
 ### 1. Главный экран Swagger со всеми эндпоинтами
 ![Главный экран](https://github.com/freed0m52/front_and_back/blob/main/practice_5/1.PNG)
@@ -20,8 +18,9 @@
 ### 6. DELETE /api/products/{id} - удаление товара
 ![DELETE product](https://github.com/freed0m52/front_and_back/blob/main/practice_5/6.PNG)
 
-### 7. Пример выполнения PATCH запроса
-![PATCH example](7.png)
+### 7. PATCH /api/products/{id} - обновление товара
+![PATCH example](https://github.com/freed0m52/front_and_back/blob/main/practice_5/7.PNG)
+
 
 
 

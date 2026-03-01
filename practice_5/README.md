@@ -18,10 +18,11 @@
 ![PATCH product](https://github.com/freed0m52/front_and_back/blob/main/practice_5/5.PNG)
 
 ### 6. DELETE /api/products/{id} - удаление товара
-![DELETE product](6.png)
+![DELETE product](https://github.com/freed0m52/front_and_back/blob/main/practice_5/6.PNG)
 
 ### 7. Пример выполнения PATCH запроса
 ![PATCH example](7.png)
+
 
 
 

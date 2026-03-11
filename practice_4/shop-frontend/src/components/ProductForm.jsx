@@ -48,7 +48,6 @@ export default function ProductForm({ open, mode, initialProduct, onClose, onSub
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Проверка обязательных полей
         if (!formData.name || !formData.category || !formData.description || !formData.price || !formData.stock) {
             alert('Заполните все обязательные поля');
             return;

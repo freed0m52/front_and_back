@@ -7,7 +7,8 @@ const Register = () => {
     email: '',
     password: '',
     first_name: '',
-    last_name: ''
+    last_name: '',
+    role: 'user'
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -32,6 +33,17 @@ const Register = () => {
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setError(err.response?.data?.error || 'Ошибка регистрации');
+    }
+  };
+
+  const getRoleDescription = (role) => {
+    switch(role) {
+      case 'admin':
+        return '🔐 Полный доступ: управление товарами и пользователями';
+      case 'seller':
+        return '📦 Может создавать и редактировать товары';
+      default:
+        return '👁️ Только просмотр товаров';
     }
   };
 
@@ -92,6 +104,22 @@ const Register = () => {
             />
           </div>
 
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Роль</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              style={styles.select}
+            >
+              <option value="user">👤 Пользователь</option>
+              <option value="seller">📦 Продавец</option>
+              <option value="admin">👑 Администратор</option>
+            </select>
+            <p style={styles.hint}>{getRoleDescription(formData.role)}</p>
+            <p style={styles.note}>💡 Примечание: Администратор может управлять пользователями и товарами. Первый зарегистрированный пользователь автоматически становится администратором.</p>
+          </div>
+
           <button type="submit" style={styles.button}>
             Зарегистрироваться
           </button>
@@ -119,7 +147,7 @@ const styles = {
     borderRadius: '8px',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
     width: '100%',
-    maxWidth: '400px',
+    maxWidth: '450px',
   },
   title: {
     textAlign: 'center',
@@ -145,6 +173,26 @@ const styles = {
     border: '1px solid #ddd',
     borderRadius: '4px',
     fontSize: '16px',
+  },
+  select: {
+    width: '100%',
+    padding: '10px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    fontSize: '16px',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+  },
+  hint: {
+    fontSize: '12px',
+    color: '#666',
+    marginTop: '5px',
+  },
+  note: {
+    fontSize: '11px',
+    color: '#999',
+    marginTop: '8px',
+    fontStyle: 'italic',
   },
   button: {
     padding: '12px',

@@ -19,6 +19,10 @@ const ProductDetail = () => {
     imageUrl: ''
   });
 
+  const canEdit = (user && user.role === 'admin') || 
+                  (user && user.role === 'seller' && product?.created_by === user.id);
+  const canDelete = user && user.role === 'admin';
+
   useEffect(() => {
     loadProduct();
   }, [id]);
@@ -120,8 +124,6 @@ const ProductDetail = () => {
     );
   }
 
-  const isOwner = product.created_by === user?.id;
-
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -194,7 +196,6 @@ const ProductDetail = () => {
                 value={formData.imageUrl}
                 onChange={handleInputChange}
                 style={styles.input}
-                placeholder="https://example.com/image.jpg"
               />
             </div>
 
@@ -249,7 +250,7 @@ const ProductDetail = () => {
           <div style={styles.contentContainer}>
             <div style={styles.productHeader}>
               <h2 style={styles.productTitle}>{product.title}</h2>
-              {isOwner && (
+              {product.created_by === user?.id && (
                 <span style={styles.ownerBadge}>👑 Ваш товар</span>
               )}
             </div>
@@ -285,26 +286,24 @@ const ProductDetail = () => {
               )}
             </div>
             
-            {isOwner && (
+            {(canEdit || canDelete) && (
               <div style={styles.actions}>
-                <button 
-                  onClick={() => setIsEditing(true)}
-                  style={styles.editButton}
-                >
-                  ✏️ Редактировать
-                </button>
-                <button 
-                  onClick={handleDelete}
-                  style={styles.deleteButton}
-                >
-                  🗑️ Удалить
-                </button>
-              </div>
-            )}
-
-            {!isOwner && user && (
-              <div style={styles.notOwnerMessage}>
-                <p>ⓘ Вы можете только просматривать этот товар</p>
+                {canEdit && (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    style={styles.editButton}
+                  >
+                    ✏️ Редактировать
+                  </button>
+                )}
+                {canDelete && (
+                  <button 
+                    onClick={handleDelete}
+                    style={styles.deleteButton}
+                  >
+                    🗑️ Удалить
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -335,7 +334,6 @@ const styles = {
     backgroundColor: 'white',
     borderRadius: '8px',
     boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    transition: 'background-color 0.3s',
   },
   card: {
     backgroundColor: 'white',
@@ -435,7 +433,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: '500',
     flex: 1,
-    transition: 'background-color 0.3s',
   },
   deleteButton: {
     padding: '12px 24px',
@@ -447,7 +444,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: '500',
     flex: 1,
-    transition: 'background-color 0.3s',
   },
   formContainer: {
     backgroundColor: 'white',
@@ -480,7 +476,6 @@ const styles = {
     border: '2px solid #e0e0e0',
     borderRadius: '8px',
     fontSize: '16px',
-    transition: 'border-color 0.3s',
     outline: 'none',
   },
   textarea: {
@@ -522,7 +517,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: '500',
     flex: 1,
-    transition: 'background-color 0.3s',
   },
   cancelButton: {
     padding: '12px 24px',
@@ -534,15 +528,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: '500',
     flex: 1,
-    transition: 'background-color 0.3s',
-  },
-  notOwnerMessage: {
-    marginTop: '20px',
-    padding: '15px',
-    backgroundColor: '#e3f2fd',
-    borderRadius: '8px',
-    color: '#1976d2',
-    textAlign: 'center',
   },
   loading: {
     textAlign: 'center',

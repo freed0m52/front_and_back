@@ -10,7 +10,6 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Проверяем, есть ли токен и загружаем пользователя
     const token = localStorage.getItem('accessToken');
     if (token) {
       loadUser();
@@ -34,12 +33,12 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const response = await api.login({ email, password });
-    const { accessToken, refreshToken } = response.data;
+    const { accessToken, refreshToken, user: userData } = response.data;
     
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     
-    await loadUser();
+    setUser(userData);
     return response.data;
   };
 
@@ -64,12 +63,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = async (userId, data) => {
+    const response = await api.updateUser(userId, data);
+    if (user && user.id === userId) {
+      setUser(prev => ({ ...prev, ...response.data }));
+    }
+    return response.data;
+  };
+
+  const blockUser = async (userId) => {
+    const response = await api.blockUser(userId);
+    return response.data;
+  };
+
+  const unblockUser = async (userId) => {
+    const response = await api.unblockUser(userId);
+    return response.data;
+  };
+
   const value = {
     user,
     loading,
     login,
     register,
     logout,
+    updateUser,
+    blockUser,
+    unblockUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

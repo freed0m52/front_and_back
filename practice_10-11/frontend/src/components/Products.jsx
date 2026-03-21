@@ -17,6 +17,9 @@ const Products = () => {
     imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300'
   });
 
+  const canCreate = user && (user.role === 'seller' || user.role === 'admin');
+  const isAdmin = user && user.role === 'admin';
+
   useEffect(() => {
     loadProducts();
   }, []);
@@ -79,6 +82,16 @@ const Products = () => {
     return url;
   };
 
+  const getRoleBadge = () => {
+    switch(user?.role) {
+      case 'admin': return { text: '👑 Администратор', color: '#dc3545' };
+      case 'seller': return { text: '📦 Продавец', color: '#ffc107' };
+      default: return { text: '👤 Пользователь', color: '#6c757d' };
+    }
+  };
+
+  const roleBadge = getRoleBadge();
+
   if (loading) return (
     <div style={styles.loading}>
       <div style={styles.spinner}></div>
@@ -89,9 +102,17 @@ const Products = () => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.title}>Мой Магазин</h1>
+        <div>
+          <h1 style={styles.title}>Мой Магазин</h1>
+          <div style={styles.roleBadge} className={`role-badge-${user?.role}`}>
+            {roleBadge.text}
+          </div>
+        </div>
         <div style={styles.userInfo}>
-          <span style={styles.welcomeText}>Привет, {user?.first_name}!</span>
+          <span style={styles.welcomeText}>
+            Привет, {user?.first_name}! 
+            <span style={styles.roleText}>({user?.role})</span>
+          </span>
           <button onClick={logout} style={styles.logoutButton}>
             🚪 Выйти
           </button>
@@ -101,15 +122,22 @@ const Products = () => {
       {error && <div style={styles.error}>{error}</div>}
 
       <div style={styles.actions}>
-        <button 
-          onClick={() => setShowForm(!showForm)} 
-          style={showForm ? styles.cancelButton : styles.addButton}
-        >
-          {showForm ? '✕ Отмена' : '+ Добавить товар'}
-        </button>
+        {canCreate && (
+          <button 
+            onClick={() => setShowForm(!showForm)} 
+            style={showForm ? styles.cancelButton : styles.addButton}
+          >
+            {showForm ? '✕ Отмена' : '+ Добавить товар'}
+          </button>
+        )}
+        {isAdmin && (
+          <Link to="/users" style={styles.adminButton}>
+            👥 Управление пользователями
+          </Link>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && canCreate && (
         <div style={styles.formContainer}>
           <h3 style={styles.formTitle}>➕ Новый товар</h3>
           <form onSubmit={handleCreateProduct} style={styles.form}>
@@ -153,7 +181,7 @@ const Products = () => {
             <input
               type="text"
               name="imageUrl"
-              placeholder="URL фото (оставьте пустым для фото по умолчанию)"
+              placeholder="URL фото"
               value={newProduct.imageUrl}
               onChange={handleInputChange}
               style={styles.input}
@@ -169,12 +197,6 @@ const Products = () => {
                 }}
               />
             </div>
-            <p style={styles.hint}>
-              💡 Примеры фото: 
-              <br/>• Наушники: https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300
-              <br/>• Часы: https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300
-              <br/>• Кроссовки: https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300
-            </p>
             <button type="submit" style={styles.submitButton}>
               ✅ Создать товар
             </button>
@@ -186,43 +208,54 @@ const Products = () => {
         {products.length === 0 ? (
           <p style={styles.empty}>🛍️ Товаров пока нет. Создайте первый товар!</p>
         ) : (
-          products.map(product => (
-            <div key={product.id} style={styles.productCard}>
-              <div style={styles.imageContainer}>
-                <img 
-                  src={getImageUrl(product.imageUrl)}
-                  alt={product.title}
-                  style={styles.productImage}
-                  onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
-                  }}
-                />
+          products.map(product => {
+            const canEdit = (user && user.role === 'admin') || 
+                           (user && user.role === 'seller' && product.created_by === user.id);
+            const canDelete = user && user.role === 'admin';
+
+            return (
+              <div key={product.id} style={styles.productCard}>
+                <div style={styles.imageContainer}>
+                  <img 
+                    src={getImageUrl(product.imageUrl)}
+                    alt={product.title}
+                    style={styles.productImage}
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300';
+                    }}
+                  />
+                </div>
+                <div style={styles.productContent}>
+                  <h3 style={styles.productTitle}>{product.title}</h3>
+                  <p style={styles.productCategory}>{product.category}</p>
+                  <p style={styles.productDescription}>
+                    {product.description.length > 80 
+                      ? product.description.substring(0, 80) + '...' 
+                      : product.description}
+                  </p>
+                  <p style={styles.productPrice}>{product.price} ₽</p>
+                </div>
+                <div style={styles.cardActions}>
+                  <Link to={`/products/${product.id}`} style={styles.viewButton}>
+                    👁️ Подробнее
+                  </Link>
+                  {canEdit && (
+                    <Link to={`/products/${product.id}/edit`} style={styles.editButton}>
+                      ✏️ Редактировать
+                    </Link>
+                  )}
+                  {canDelete && (
+                    <button 
+                      onClick={() => handleDeleteProduct(product.id)}
+                      style={styles.deleteButton}
+                    >
+                      🗑️ Удалить
+                    </button>
+                  )}
+                </div>
               </div>
-              <div style={styles.productContent}>
-                <h3 style={styles.productTitle}>{product.title}</h3>
-                <p style={styles.productCategory}>{product.category}</p>
-                <p style={styles.productDescription}>
-                  {product.description.length > 80 
-                    ? product.description.substring(0, 80) + '...' 
-                    : product.description}
-                </p>
-                <p style={styles.productPrice}>{product.price} ₽</p>
-              </div>
-              <div style={styles.cardActions}>
-                <Link to={`/products/${product.id}`} style={styles.viewButton}>
-                  👁️ Подробнее
-                </Link>
-                {product.created_by === user?.id && (
-                  <button 
-                    onClick={() => handleDeleteProduct(product.id)}
-                    style={styles.deleteButton}
-                  >
-                    🗑️ Удалить
-                  </button>
-                )}
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 
@@ -230,6 +263,16 @@ const Products = () => {
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        .role-badge-admin {
+          background-color: #dc3545;
+        }
+        .role-badge-seller {
+          background-color: #ffc107;
+          color: #333;
+        }
+        .role-badge-user {
+          background-color: #6c757d;
         }
       `}</style>
     </div>
@@ -261,6 +304,16 @@ const styles = {
     margin: 0,
     fontWeight: '600',
   },
+  roleBadge: {
+    display: 'inline-block',
+    padding: '4px 12px',
+    borderRadius: '20px',
+    fontSize: '12px',
+    fontWeight: '500',
+    marginTop: '8px',
+    backgroundColor: '#6c757d',
+    color: 'white',
+  },
   userInfo: {
     display: 'flex',
     alignItems: 'center',
@@ -270,6 +323,11 @@ const styles = {
     fontSize: '16px',
     color: '#666',
   },
+  roleText: {
+    marginLeft: '5px',
+    fontSize: '12px',
+    color: '#999',
+  },
   logoutButton: {
     padding: '8px 16px',
     backgroundColor: '#dc3545',
@@ -278,9 +336,10 @@ const styles = {
     borderRadius: '6px',
     cursor: 'pointer',
     fontSize: '14px',
-    transition: 'background-color 0.3s',
   },
   actions: {
+    display: 'flex',
+    gap: '15px',
     marginBottom: '20px',
   },
   addButton: {
@@ -292,7 +351,15 @@ const styles = {
     cursor: 'pointer',
     fontSize: '16px',
     fontWeight: '500',
-    transition: 'background-color 0.3s',
+  },
+  adminButton: {
+    padding: '12px 24px',
+    backgroundColor: '#dc3545',
+    color: 'white',
+    textDecoration: 'none',
+    borderRadius: '6px',
+    fontSize: '16px',
+    fontWeight: '500',
   },
   cancelButton: {
     padding: '12px 24px',
@@ -303,7 +370,6 @@ const styles = {
     cursor: 'pointer',
     fontSize: '16px',
     fontWeight: '500',
-    transition: 'background-color 0.3s',
   },
   formContainer: {
     backgroundColor: 'white',
@@ -327,7 +393,6 @@ const styles = {
     border: '2px solid #e0e0e0',
     borderRadius: '8px',
     fontSize: '16px',
-    transition: 'border-color 0.3s',
     outline: 'none',
   },
   textarea: {
@@ -355,15 +420,6 @@ const styles = {
     borderRadius: '8px',
     border: '2px solid #e0e0e0',
   },
-  hint: {
-    color: '#666',
-    fontSize: '14px',
-    lineHeight: '1.6',
-    backgroundColor: '#f8f9fa',
-    padding: '12px',
-    borderRadius: '8px',
-    margin: '5px 0',
-  },
   submitButton: {
     padding: '14px',
     backgroundColor: '#007bff',
@@ -374,7 +430,6 @@ const styles = {
     fontSize: '16px',
     fontWeight: '500',
     marginTop: '10px',
-    transition: 'background-color 0.3s',
   },
   productsGrid: {
     display: 'grid',
@@ -386,7 +441,7 @@ const styles = {
     borderRadius: '12px',
     overflow: 'hidden',
     boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    transition: 'transform 0.3s, box-shadow 0.3s',
+    transition: 'transform 0.3s',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -400,7 +455,6 @@ const styles = {
     width: '100%',
     height: '100%',
     objectFit: 'cover',
-    transition: 'transform 0.3s',
   },
   productContent: {
     padding: '20px',
@@ -448,7 +502,16 @@ const styles = {
     fontSize: '14px',
     flex: 1,
     textAlign: 'center',
-    transition: 'background-color 0.3s',
+  },
+  editButton: {
+    padding: '8px 12px',
+    backgroundColor: '#ffc107',
+    color: '#333',
+    textDecoration: 'none',
+    borderRadius: '6px',
+    fontSize: '14px',
+    flex: 1,
+    textAlign: 'center',
   },
   deleteButton: {
     padding: '8px 12px',
@@ -459,7 +522,6 @@ const styles = {
     cursor: 'pointer',
     fontSize: '14px',
     flex: 1,
-    transition: 'background-color 0.3s',
   },
   loading: {
     textAlign: 'center',

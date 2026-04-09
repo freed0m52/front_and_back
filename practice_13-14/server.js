@@ -1,0 +1,79 @@
+const express = require('express');
+const https = require('https');
+const fs = require('fs');
+const socketIo = require('socket.io');
+const webpush = require('web-push');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const path = require('path');
+
+const vapidKeys = {
+    publicKey: 'BNpfDa-79b7QcGVO-nrF0KSq4Rd3t8Fk0LWXyaxEhbquE0YgnsBE6gq-fW103wOBYyNGK5UWujBVPHV5eM099ss',
+    privateKey: 'TX0udtshTsdyLFiF2B7XaA3IMKhmS7oSO4CgQxPKoW0'
+};
+
+webpush.setVapidDetails(
+    'mailto:vkmeseroff@mail.ru',
+    vapidKeys.publicKey,
+    vapidKeys.privateKey
+);
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname, './')));
+
+// Хранилище подписок
+let subscriptions = [];
+
+// Читаем SSL сертификаты (сгенерированные через mkcert)
+const options = {
+    key: fs.readFileSync('localhost-key.pem'),
+    cert: fs.readFileSync('localhost.pem')
+};
+
+const server = https.createServer(options, app);
+const io = socketIo(server, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('Клиент подключён:', socket.id);
+
+    socket.on('newTask', (task) => {
+        io.emit('taskAdded', task);
+
+        const payload = JSON.stringify({
+            title: 'Новая задача',
+            body: task.text
+        });
+
+        subscriptions.forEach(sub => {
+            webpush.sendNotification(sub, payload).catch(err => console.error('Push error:', err));
+        });
+    });
+
+    socket.on('disconnect', () => {
+        console.log('Клиент отключён:', socket.id);
+    });
+});
+
+app.post('/subscribe', (req, res) => {
+    subscriptions.push(req.body);
+    res.status(201).json({ message: 'Подписка сохранена' });
+});
+
+app.post('/unsubscribe', (req, res) => {
+    const { endpoint } = req.body;
+    subscriptions = subscriptions.filter(sub => sub.endpoint !== endpoint);
+    res.status(200).json({ message: 'Подписка удалена' });
+});
+
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Сервер запущен на https://localhost:${PORT}`);
+});

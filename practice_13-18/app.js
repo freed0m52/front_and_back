@@ -83,22 +83,43 @@ loadContent('home');
 function initNotes() {
     const form = document.getElementById('note-form');
     const input = document.getElementById('note-input');
+    const reminderForm = document.getElementById('reminder-form');
+    const reminderText = document.getElementById('reminder-text');
+    const reminderTime = document.getElementById('reminder-time');
     const list = document.getElementById('notes-list');
-    
+
     function loadNotes() {
         const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-        list.innerHTML = notes.map(note => `<li class="card" style="margin-bottom: 0.5rem; padding: 0.5rem;">${note}</li>`).join('');
+        list.innerHTML = notes.map(note => {
+            let reminderInfo = '';
+            if (note.reminder) {
+                const date = new Date(note.reminder);
+                reminderInfo = `<br><small>!!! Напоминание: ${date.toLocaleString()}</small>`;
+            }
+            return `<li class="card" style="margin-bottom: 0.5rem; padding: 0.5rem;">${note.text}${reminderInfo}</li>`;
+        }).join('');
     }
-    
+
     function addNote(text) {
         const notes = JSON.parse(localStorage.getItem('notes') || '[]');
-        notes.push(text);
+        const newNote = { id: Date.now(), text: text };
+        notes.push(newNote);
         localStorage.setItem('notes', JSON.stringify(notes));
         loadNotes();
-        
         socket.emit('newTask', { text: text });
     }
-    
+
+    function addReminder(text, reminderTime) {
+        const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+        const id = Date.now();
+        const reminderTimestamp = new Date(reminderTime).getTime();
+        const newNote = { id: id, text: text, reminder: reminderTimestamp };
+        notes.push(newNote);
+        localStorage.setItem('notes', JSON.stringify(notes));
+        loadNotes();
+        socket.emit('newReminder', { id: id, text: text, reminderTime: reminderTimestamp });
+    }
+
     form.addEventListener('submit', (e) => {
         e.preventDefault();
         const text = input.value.trim();
@@ -107,7 +128,18 @@ function initNotes() {
             input.value = '';
         }
     });
-    
+
+    reminderForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = reminderText.value.trim();
+        const time = reminderTime.value;
+        if (text && time) {
+            addReminder(text, time);
+            reminderText.value = '';
+            reminderTime.value = '';
+        }
+    });
+
     loadNotes();
 }
 
